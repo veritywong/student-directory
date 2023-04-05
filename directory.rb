@@ -3,7 +3,7 @@
 def print_menu
   puts "1. Input the students"
   puts "2. Show the students"
-  puts "3. Save the list to students.csv"
+  puts "3. Save changes to students.csv"
   puts "4. Load the list from students.csv"
   puts "9. Exit" # 9 because we'll be adding more items
 end
@@ -15,16 +15,25 @@ def interactive_menu
   end
 end
 
+def action
+  puts "\n - action successful - 
+  "
+end
+
 def process(selection)
   case selection
     when "1"
       input_students
+      action
     when "2"
       show_students
+      action
     when "3"
       save_students
+      action
     when "4"
       load_students
+      action
     when "9"
       exit
     else
@@ -74,7 +83,9 @@ end
 
 def save_students
   # open the file for writing
-  file = File.open("students.csv", "w")
+  puts "What file would you like to add the students to?"
+  file = STDIN.gets.chomp
+  file = File.open(file, "w")
   # iterate over the array of students
   @students.each do |student|
     student_data = [student[:name], student[:cohort]]
@@ -84,8 +95,10 @@ def save_students
   file.close
 end
 
-def load_students(filename = "students.csv")
-  file = File.open("students.csv", "r")
+def load_students(filename = STDIN.gets.chomp)
+  puts "What file would you like to load?"
+  file_choice = STDIN.gets.chomp
+  file = File.open(file_choice, "r")
   file.readlines.each do |line|
   name, cohort = line.chomp.split(',')
     add_students(name, cohort.to_sym)
@@ -93,10 +106,10 @@ def load_students(filename = "students.csv")
   file.close
 end
 
-def try_load_students
+def run_load_students
   filename = ARGV.first # first argument from the command line
   if filename.nil? # if not first argument then automatically loads students.csv
-    load_students
+    load_students(filename)
   elsif File.exist?(filename)
     load_students(filename)
     puts "Loaded #{@students.count} from #{filename}"
@@ -106,5 +119,5 @@ def try_load_students
   end
 end
 
-try_load_students
+run_load_students
 interactive_menu
