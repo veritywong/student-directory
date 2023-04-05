@@ -85,25 +85,25 @@ def save_students
   # open the file for writing
   puts "What file would you like to add the students to?"
   file = STDIN.gets.chomp
-  file = File.open(file, "w")
+  File::open(file, "w") do |f|
   # iterate over the array of students
   @students.each do |student|
     student_data = [student[:name], student[:cohort]]
     csv_line = student_data.join(",")
-    file.puts csv_line
+    f.puts csv_line
   end
-  file.close
+end
 end
 
 def load_students(filename = STDIN.gets.chomp)
   puts "What file would you like to load?"
   file_choice = STDIN.gets.chomp
-  file = File.open(file_choice, "r")
-  file.readlines.each do |line|
+  File::open(file_choice, "r") do |f|
+  f.readlines.each do |line|
   name, cohort = line.chomp.split(',')
     add_students(name, cohort.to_sym)
   end
-  file.close
+end
 end
 
 def run_load_students
