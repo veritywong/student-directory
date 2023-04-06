@@ -1,7 +1,8 @@
 @students = []
+require "csv"
 
 def print_menu
-  puts "1. Input the students"
+  puts "\n1. Input the students"
   puts "2. Show the students"
   puts "3. Save changes to students.csv"
   puts "4. Load the list from students.csv"
@@ -15,25 +16,17 @@ def interactive_menu
   end
 end
 
-def action
-  puts "\n - action successful - 
-  "
-end
-
 def process(selection)
+  puts "\nYou have chosen #{selection}:"
   case selection
     when "1"
       input_students
-      action
     when "2"
       show_students
-      action
     when "3"
       save_students
-      action
     when "4"
       load_students
-      action
     when "9"
       exit
     else
@@ -67,7 +60,7 @@ def show_students
 end 
 
 def print_header
-  puts "The students of Villains Academy"
+  puts "\nThe students of Villains Academy"
   puts "------------------"
 end
 
@@ -83,33 +76,28 @@ end
 
 def save_students
   # open the file for writing
+  # if load_students hasn't been run then overwrites file with new inputs
   puts "What file would you like to add the students to?"
   file = STDIN.gets.chomp
-  File::open(file, "w") do |f|
-  # iterate over the array of students
-  @students.each do |student|
-    student_data = [student[:name], student[:cohort]]
-    csv_line = student_data.join(",")
-    f.puts csv_line
+  CSV.open(file, "wb") do |csv|
+    @students.each do |student|
+      csv << student.values
+    end
   end
 end
+
+def load_students(filename = "students.csv")
+    CSV.foreach(filename) do |row|
+      name, cohort = row
+      add_students(name, cohort.to_sym)
+    end
 end
 
-def load_students(filename = STDIN.gets.chomp)
-  puts "What file would you like to load?"
-  file_choice = STDIN.gets.chomp
-  File::open(file_choice, "r") do |f|
-  f.readlines.each do |line|
-  name, cohort = line.chomp.split(',')
-    add_students(name, cohort.to_sym)
-  end
-end
-end
-
+# is this method necessary?
 def run_load_students
   filename = ARGV.first # first argument from the command line
   if filename.nil? # if not first argument then automatically loads students.csv
-    load_students(filename)
+   load_students("students.csv")
   elsif File.exist?(filename)
     load_students(filename)
     puts "Loaded #{@students.count} from #{filename}"
